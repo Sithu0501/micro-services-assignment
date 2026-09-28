@@ -10,7 +10,7 @@ spring:
     name: driver-vehicle-service
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb+srv://it24102971_db_user:4Yz9waUXesMwrAlz@ridelink.pcs3g0k.mongodb.net/ridelink_driver_db?retryWrites=true&w=majority}
+      uri: ${MONGODB_URI:mongodb+srv://thewjantmk_db_user:v5U1jWnhtkuXBYoR@ridelinkcluster.iaqnudz.mongodb.net/ridelink_driver_db?retryWrites=true&w=majority&appName=RideLinkCluster}
       database: ridelink_driver_db
       auto-index-creation: true
 
