@@ -1,0 +1,19 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: account-service-test
+  data:
+    mongodb:
+      database: ridelink_account_db
+      auto-index-creation: false
+
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  expiration: 86400000
+
+logging:
+  level:
+    root: WARN
+    com.ridelink.accountservice: INFO
