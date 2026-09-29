@@ -112,7 +112,7 @@ public class DriverController {
         return ResponseEntity.ok(ApiResponse.success("Driver profile retrieved successfully", response));
     }
 
-    @PutMapping("/me")
+    @RequestMapping(value = "/me", method = {RequestMethod.PUT, RequestMethod.PATCH})
     @Operation(summary = "Update current driver profile", description = "Updates operational contact, license expiry, or service area for the authenticated driver.")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -140,7 +140,7 @@ public class DriverController {
         return ResponseEntity.ok(ApiResponse.success("Driver profile updated successfully", response));
     }
 
-    @PatchMapping("/me/availability")
+    @RequestMapping(value = "/me/availability", method = {RequestMethod.PATCH, RequestMethod.PUT})
     @Operation(summary = "Update driver availability status", description = "Toggles driver availability between AVAILABLE, UNAVAILABLE, and ON_TRIP.")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -168,7 +168,7 @@ public class DriverController {
         return ResponseEntity.ok(ApiResponse.success("Availability status updated successfully", response));
     }
 
-    @PutMapping("/me/location")
+    @RequestMapping(value = "/me/location", method = {RequestMethod.PUT, RequestMethod.PATCH})
     @Operation(summary = "Update simulated GPS location", description = "Updates the driver's current simulated latitude and longitude.")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
