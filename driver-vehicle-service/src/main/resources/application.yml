@@ -1,0 +1,40 @@
+server:
+  port: ${PORT:8082}
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+
+spring:
+  application:
+    name: driver-vehicle-service
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb+srv://thewjantmk_db_user:v5U1jWnhtkuXBYoR@ridelinkcluster.iaqnudz.mongodb.net/ridelink_driver_db?retryWrites=true&w=majority&appName=RideLinkCluster}
+      database: ridelink_driver_db
+      auto-index-creation: true
+
+jwt:
+  # Secret key (HMAC-SHA256, minimum 256 bits). Override in production via JWT_SECRET environment variable.
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  # Expiration in milliseconds: default 86400000 ms (24 hours)
+  expiration: ${JWT_EXPIRATION:86400000}
+
+# Springdoc OpenAPI / Swagger UI configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui/index.html
+    enabled: true
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+
+logging:
+  level:
+    root: INFO
+    com.ridelink.drivervehicleservice: DEBUG
+    org.springframework.security: INFO
+    org.springframework.data.mongodb: INFO
