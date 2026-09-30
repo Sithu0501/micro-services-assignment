@@ -1,0 +1,36 @@
+server:
+  port: ${PORT:8084}
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+
+spring:
+  application:
+    name: fare-payment-service
+  data:
+    mongodb:
+      uri: ${PAYMENT_MONGODB_URI:mongodb://localhost:27017/ridelink_payment_db}
+      database: ${PAYMENT_DB_NAME:ridelink_payment_db}
+      auto-index-creation: true
+
+jwt:
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui/index.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    try-it-out-enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.ridelink.fare_payment_service: DEBUG
+    org.springframework.security: INFO
+    org.springframework.data.mongodb: INFO
