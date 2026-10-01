@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.ridelink.ridemanagement.controller.RideControllerTest
 -------------------------------------------------------------------------------
-Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 17.06 s -- in com.ridelink.ridemanagement.controller.RideControllerTest
+Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.483 s -- in com.ridelink.ridemanagement.controller.RideControllerTest
