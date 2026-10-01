@@ -1,0 +1,2 @@
+Summary for c:\Users\Jayanga\Desktop\all in one\micro-services-assignment\ride-management-service\target\ride-management-service-1.0.0.jar.original
+Decompiled with CFR 0.152
