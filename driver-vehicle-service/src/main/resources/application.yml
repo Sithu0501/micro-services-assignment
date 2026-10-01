@@ -31,6 +31,12 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
     tryItOutEnabled: true
+    urls:
+      - name: "1. Account Service (User Management - Port 8081)"
+        url: http://localhost:8081/v3/api-docs
+      - name: "2. Driver & Vehicle Service (Port 8082)"
+        url: /v3/api-docs
+    urls-primary-name: "2. Driver & Vehicle Service (Port 8082)"
 
 logging:
   level:

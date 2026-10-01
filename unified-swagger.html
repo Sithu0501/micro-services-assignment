@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RideLink - Unified Microservices Swagger Portal</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #fafafa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .top-bar {
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #3b82f6;
+    }
+    .top-bar h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .badge {
+      background: #2563eb;
+      color: #ffffff;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-left: 12px;
+    }
+    .services-status {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+    .services-status span {
+      color: #4ade80;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div style="display: flex; align-items: center;">
+      <h1>RideLink API Platform</h1>
+      <span class="badge">Unified Swagger Portal</span>
+    </div>
+    <div class="services-status">
+      Ports: <span>8081</span> (Account) &bull; <span>8082</span> (Driver & Vehicle)
+    </div>
+  </div>
+
+  <div id="swagger-ui"></div>
+
+  <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js" crossorigin></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js" crossorigin></script>
+  <script>
+    window.onload = () => {
+      window.ui = SwaggerUIBundle({
+        urls: [
+          { name: "1. Account Service (Port 8081)", url: "http://localhost:8081/v3/api-docs" },
+          { name: "2. Driver & Vehicle Service (Port 8082)", url: "http://localhost:8082/v3/api-docs" }
+        ],
+        "urls.primaryName": "1. Account Service (Port 8081)",
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        layout: "StandaloneLayout"
+      });
+    };
+  </script>
+</body>
+</html>
