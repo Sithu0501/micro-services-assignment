@@ -154,7 +154,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get user by ID", description = "Retrieves a user by their unique ID. Permitted for Admins or the target user themselves.")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Get user by ID (Admin only)", description = "Retrieves a user account by their unique ID. Requires ADMIN role. Use GET /api/v1/users/me to retrieve your own profile.")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200",
@@ -176,14 +177,13 @@ public class UserController {
             @PathVariable String id,
             Authentication authentication
     ) {
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        UserResponse response = userService.getUserById(id, authentication.getName(), isAdmin);
+        UserResponse response = userService.getUserById(id);
         return ResponseEntity.ok(ApiResponse.success("User retrieved successfully", response));
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update user by ID", description = "Updates user profile by ID. Permitted for Admins or the target user themselves.")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Update user by ID (Admin only)", description = "Updates user account fields by ID. Requires ADMIN role. Use PUT /api/v1/users/me to update your own profile.")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200",
@@ -216,9 +216,7 @@ public class UserController {
             @Valid @RequestBody UpdateProfileRequest request,
             Authentication authentication
     ) {
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        UserResponse response = userService.updateUser(id, request, authentication.getName(), isAdmin);
+        UserResponse response = userService.updateUser(id, request);
         return ResponseEntity.ok(ApiResponse.success("User updated successfully", response));
     }
 

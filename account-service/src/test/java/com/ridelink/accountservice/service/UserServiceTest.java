@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -107,39 +106,21 @@ class UserServiceTest {
         User targetUser = new User("uid-target", "Target User", "target@ridelink.com", "+94771234567", "pwd", Role.PASSENGER, AccountStatus.ACTIVE);
         when(userRepository.findById("uid-target")).thenReturn(Optional.of(targetUser));
 
-        UserResponse response = userService.getUserById("uid-target", "admin@ridelink.com", true);
+        UserResponse response = userService.getUserById("uid-target");
 
         assertNotNull(response);
         assertEquals("uid-target", response.id());
     }
 
-    @Test
-    @DisplayName("Get user by ID succeeds when caller is target user themselves")
-    void testGetUserByIdAsSelf() {
-        User self = new User("uid-self", "Self User", "self@ridelink.com", "+94771234567", "pwd", Role.PASSENGER, AccountStatus.ACTIVE);
-        when(userRepository.findById("uid-self")).thenReturn(Optional.of(self));
-
-        UserResponse response = userService.getUserById("uid-self", "self@ridelink.com", false);
-
-        assertNotNull(response);
-        assertEquals("uid-self", response.id());
-    }
-
-    @Test
-    @DisplayName("Get user by ID fails with AccessDeniedException when non-admin accesses someone else's record")
-    void testGetUserByIdUnauthorized() {
-        User targetUser = new User("uid-other", "Other User", "other@ridelink.com", "+94771234567", "pwd", Role.PASSENGER, AccountStatus.ACTIVE);
-        when(userRepository.findById("uid-other")).thenReturn(Optional.of(targetUser));
-
-        assertThrows(AccessDeniedException.class, () -> userService.getUserById("uid-other", "impostor@ridelink.com", false));
-    }
+    // testGetUserByIdAsSelf and testGetUserByIdUnauthorized are removed: endpoint is now ADMIN-only
+    // at the security layer. Non-admin access is blocked before reaching the service.
 
     @Test
     @DisplayName("Get non-existent user throws ResourceNotFoundException")
     void testGetUserNotFound() {
         when(userRepository.findById("unknown-id")).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> userService.getUserById("unknown-id", "admin@ridelink.com", true));
+        assertThrows(ResourceNotFoundException.class, () -> userService.getUserById("unknown-id"));
     }
 
     @Test

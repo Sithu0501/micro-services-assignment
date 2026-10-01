@@ -10,7 +10,7 @@ spring:
     name: account-service
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb+srv://it24102971_db_user:4Yz9waUXesMwrAlz@ridelink.pcs3g0k.mongodb.net/ridelink_account_db?retryWrites=true&w=majority}
+      uri: ${MONGODB_URI}
       database: ridelink_account_db
       auto-index-creation: true
 
@@ -38,3 +38,14 @@ logging:
     com.ridelink.accountservice: DEBUG
     org.springframework.security: INFO
     org.springframework.data.mongodb: INFO
+
+# Admin bootstrap configuration
+# Used by AdminBootstrapService to seed an initial ADMIN account at startup.
+# Override in .env / environment. Never hardcode real values here.
+admin:
+  bootstrap:
+    enabled: ${ADMIN_BOOTSTRAP_ENABLED:true}
+    email: ${ADMIN_EMAIL:admin@ridelink.com}
+    password: ${ADMIN_PASSWORD:Admin@RideLink2026!}
+    full-name: ${ADMIN_FULL_NAME:RideLink Admin}
+    phone: ${ADMIN_PHONE:+94770000001}

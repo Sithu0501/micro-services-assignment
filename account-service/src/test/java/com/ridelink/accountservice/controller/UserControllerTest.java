@@ -221,4 +221,36 @@ class UserControllerTest {
 
         verify(userRepository).delete(passengerUser);
     }
+
+    @Test
+    @DisplayName("GET /api/v1/users/{id} - RBAC: Passenger is forbidden from getting user by ID (403 Forbidden)")
+    void testGetUserByIdAsPassengerForbidden() throws Exception {
+        mockMvc.perform(get("/api/v1/users/passenger-id-1")
+                        .header("Authorization", passengerToken))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.status", is(403)));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/users/{id} - Admin can retrieve user by ID (200 OK)")
+    void testGetUserByIdAsAdminSuccess() throws Exception {
+        when(userRepository.findById("passenger-id-1")).thenReturn(Optional.of(passengerUser));
+
+        mockMvc.perform(get("/api/v1/users/passenger-id-1")
+                        .header("Authorization", adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.email", is("passenger@ridelink.com")));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/users/{id} - Returns 404 for unknown user ID (Admin)")
+    void testGetUserByIdNotFound() throws Exception {
+        when(userRepository.findById("unknown-id")).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/v1/users/unknown-id")
+                        .header("Authorization", adminToken))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status", is(404)));
+    }
 }
