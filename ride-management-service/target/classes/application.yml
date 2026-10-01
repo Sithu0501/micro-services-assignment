@@ -1,0 +1,57 @@
+server:
+  port: ${PORT:8083}
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+
+spring:
+  application:
+    name: ride-management-service
+  data:
+    mongodb:
+      uri: ${RIDE_MONGODB_URI:mongodb+srv://it24102971_db_user:4Yz9waUXesMwrAlz@ridelink.pcs3g0k.mongodb.net/ridelink_ride_db?retryWrites=true&w=majority}
+      database: ridelink_ride_db
+      auto-index-creation: true
+
+services:
+  account:
+    url: ${ACCOUNT_SERVICE_URL:http://localhost:8081}
+    connect-timeout-ms: 3000
+    read-timeout-ms: 5000
+  driver:
+    url: ${DRIVER_SERVICE_URL:http://localhost:8082}
+    connect-timeout-ms: 3000
+    read-timeout-ms: 5000
+
+jwt:
+  # Secret key (HMAC-SHA256, minimum 256 bits). Shared secret matching Account Service.
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+# Springdoc OpenAPI / Swagger UI configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui/index.html
+    enabled: true
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+    urls:
+      - name: "1. Account Service (Port 8081)"
+        url: http://localhost:8081/v3/api-docs
+      - name: "2. Driver & Vehicle Service (Port 8082)"
+        url: http://localhost:8082/v3/api-docs
+      - name: "3. Ride Management Service (Port 8083)"
+        url: /v3/api-docs
+    urls-primary-name: "3. Ride Management Service (Port 8083)"
+
+logging:
+  level:
+    root: INFO
+    com.ridelink.ridemanagement: DEBUG
+    org.springframework.security: INFO
+    org.springframework.data.mongodb: INFO
