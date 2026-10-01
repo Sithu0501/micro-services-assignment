@@ -234,7 +234,51 @@ class AuthControllerTest {
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.status", is(403)));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status", is(401)))
+                .andExpect(jsonPath("$.error", is("Unauthorized")));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/auth/login - Rejects deactivated account with 401 Unauthorized")
+    void testLoginDeactivatedAccount() throws Exception {
+        LoginRequest request = new LoginRequest("deactivated@ridelink.com", "SafePass@2026");
+
+        User user = new User(
+                "uid-103",
+                "Deactivated User",
+                "deactivated@ridelink.com",
+                "+94771234567",
+                passwordEncoder.encode("SafePass@2026"),
+                Role.PASSENGER,
+                AccountStatus.DEACTIVATED
+        );
+        when(userRepository.findByEmail("deactivated@ridelink.com")).thenReturn(Optional.of(user));
+
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status", is(401)))
+                .andExpect(jsonPath("$.error", is("Unauthorized")));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/auth/register - Blank full name returns 400 Bad Request")
+    void testRegisterBlankFullName() throws Exception {
+        RegisterRequest request = new RegisterRequest(
+                "",
+                "blank.name@ridelink.com",
+                "0771234567",
+                "SafePass@2026",
+                Role.PASSENGER
+        );
+
+        mockMvc.perform(post("/api/v1/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status", is(400)))
+                .andExpect(jsonPath("$.fieldErrors.fullName", notNullValue()));
     }
 }

@@ -11,7 +11,6 @@ import com.ridelink.accountservice.repository.UserRepository;
 import com.ridelink.accountservice.util.ValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -81,22 +80,15 @@ public class UserService {
 
     /**
      * Retrieve a specific user by identifier.
-     * Enforces that non-admins can only view their own record.
+     * ADMIN-only endpoint: authorization is enforced at the security layer.
      *
-     * @param id                 target user id
-     * @param authenticatedEmail email of caller
-     * @param isAdmin            whether caller has ADMIN role
+     * @param id target user id
      * @return UserResponse
      */
-    public UserResponse getUserById(String id, String authenticatedEmail, boolean isAdmin) {
+    public UserResponse getUserById(String id) {
         log.debug("Fetching user by ID: {}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
-
-        if (!isAdmin && !user.getEmail().equalsIgnoreCase(authenticatedEmail)) {
-            log.warn("Unauthorized access attempt: User '{}' tried to view record of ID '{}'", authenticatedEmail, id);
-            throw new AccessDeniedException("Access denied: You do not have permission to view other users' records");
-        }
 
         return UserResponse.fromEntity(user);
     }
@@ -130,23 +122,17 @@ public class UserService {
     }
 
     /**
-     * Update user by ID. Allows self-update or ADMIN update.
+     * Update user by ID.
+     * ADMIN-only endpoint: authorization is enforced at the security layer.
      * Sensitive fields (password, role, status) cannot be altered here.
      *
-     * @param id                 target user id
-     * @param request            profile update payload
-     * @param authenticatedEmail email of caller
-     * @param isAdmin            whether caller is admin
+     * @param id      target user id
+     * @param request profile update payload
      * @return updated UserResponse
      */
-    public UserResponse updateUser(String id, UpdateProfileRequest request, String authenticatedEmail, boolean isAdmin) {
+    public UserResponse updateUser(String id, UpdateProfileRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
-
-        if (!isAdmin && !user.getEmail().equalsIgnoreCase(authenticatedEmail)) {
-            log.warn("Access denied: User '{}' tried to update user ID '{}'", authenticatedEmail, id);
-            throw new AccessDeniedException("Access denied: You do not have permission to update this user's profile");
-        }
 
         return applyProfileUpdates(user, request);
     }

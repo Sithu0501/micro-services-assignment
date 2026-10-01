@@ -88,18 +88,16 @@ public class SecurityConfig {
                         // Error endpoint
                         .requestMatchers("/error").permitAll()
 
+                        // Self Profile endpoints (Any authenticated user) - must be declared BEFORE /users/{id}
+                        .requestMatchers("/api/v1/users/me").authenticated()
+
                         // Administrative endpoints (Role: ADMIN only)
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/api/v1/users/*/status").hasRole("ADMIN")
-
-                        // Self Profile endpoints (Any authenticated user)
-                        .requestMatchers("/api/v1/users/me").authenticated()
-
-                        // Specific user lookup and update endpoints (Self or ADMIN)
-                        .requestMatchers(HttpMethod.GET, "/api/v1/users/*").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/*").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/users/**").hasRole("ADMIN")
 
                         // Any other request must be fully authenticated
                         .anyRequest().authenticated()

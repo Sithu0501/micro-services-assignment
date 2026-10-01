@@ -204,10 +204,12 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle suspended or deactivated accounts.
+     * Handle suspended or deactivated accounts attempting to authenticate.
+     * Authentication is rejected with 401 Unauthorized, not 403 Forbidden,
+     * because the issue is authentication failure (cannot prove identity as an active user).
      */
     @ExceptionHandler(AccountDisabledException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<ErrorResponse> handleAccountDisabled(
             AccountDisabledException ex,
             HttpServletRequest request
@@ -215,13 +217,13 @@ public class GlobalExceptionHandler {
         log.warn("Account blocked on {}: {}", request.getRequestURI(), ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.FORBIDDEN.value(),
-                "Account Inactive",
+                HttpStatus.UNAUTHORIZED.value(),
+                "Unauthorized",
                 ex.getMessage(),
                 request.getRequestURI()
         );
 
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     /**
