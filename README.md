@@ -2,80 +2,95 @@
 
 ## 📌 Project Overview
 
-RideLink is a backend-only ride-hailing microservices system developed for the **IT3130 – Application Development Group Assignment**.
+RideLink is a backend-only ride-hailing microservices platform developed for the **IT3130 – Application Development Group Assignment**.
 
-The system is designed using four independently executable Spring Boot microservices. Each microservice has a clear business responsibility and its own independent MongoDB database.
+The system is designed and architected as **four independently developed, independently executable Java 25 Spring Boot microservices**. Each microservice has a strictly isolated business domain, clear service boundaries, its own dedicated MongoDB database, and its own Swagger/OpenAPI documentation.
 
-The backend provides RESTful JSON APIs that can be developed, tested, and demonstrated using Swagger UI / OpenAPI and Postman. No frontend application is required.
+The backend provides RESTful JSON APIs that can be developed, tested, and demonstrated using Swagger UI / OpenAPI, Postman, and automated unit/integration tests. No frontend application or MERN/Node.js stack is introduced.
+
+---
 
 ## 🎯 Assignment Summary
 
-| Item | Details |
+| Specification | Details |
 | --- | --- |
 | **Module** | IT3130 – Application Development |
-| **Project** | RideLink |
-| **Architecture** | Microservices |
-| **Backend** | Java + Spring Boot |
-| **Java Version** | Java 25 |
-| **Database** | MongoDB |
-| **API Style** | REST / JSON |
-| **API Documentation** | OpenAPI / Swagger UI |
-| **API Testing** | Postman + Swagger UI |
-| **Frontend** | Not required |
-| **Services** | 4 |
-| **Persistence** | Independent database per service |
+| **Project** | RideLink Backend Microservices Platform |
+| **Architecture** | Independent Microservices (Synchronous REST Communication) |
+| **Core Technology** | Java 25, Spring Boot 3.5, Maven Reactor Aggregator |
+| **Databases** | 4 Isolated MongoDB Databases (Database-per-service pattern) |
+| **API Style** | RESTful JSON APIs |
+| **API Documentation** | OpenAPI 3.0 / Swagger UI on every service + Central `docs/index.html` |
+| **Security** | Spring Security 6, JWT Bearer Token, Role-Based Access Control (RBAC) |
+| **Testing** | JUnit 5, Mockito, Spring Boot Test / MockMvc (89 Automated Tests, 100% Passing) |
+| **API Testing** | Postman 2.1 Collection (`postman/RideLink.postman_collection.json`) |
+| **Build Automation** | Root Aggregator POM + GitHub Actions CI (`.github/workflows/ci.yml`) |
 
 ---
 
 ## 🏗️ System Architecture
 
-RideLink consists of four core microservices:
+RideLink consists of exactly four microservices maintaining strict persistence boundaries:
 
 ```
-                         ┌──────────────────────┐
-                         │      API Clients     │
-                         │ Swagger / Postman    │
-                         └──────────┬───────────┘
-                                    │
-                   ┌────────────────┼────────────────┐
-                   │                │                │
-                   ▼                ▼                ▼
-          ┌────────────────┐ ┌───────────────┐ ┌─────────────────┐
-          │ Account Service│ │ Driver &      │ │ Ride Management │
-          │    :8081       │ │ Vehicle       │ │ Service :8083   │
-          │                │ │ Service :8082 │ │                 │
-          └───────┬────────┘ └───────┬───────┘ └────────┬────────┘
-                  │                  │                  │
-                  ▼                  ▼                  │
-        ┌──────────────────┐ ┌──────────────────┐       │
-        │ MongoDB          │ │ MongoDB          │       │
-        │ ridelink_account │ │ ridelink_driver  │       │
-        │ _db              │ │ _db              │       │
-        └──────────────────┘ └──────────────────┘       │
-                                                         │
-                                  ┌──────────────────────┘
-                                  │
-                                  ▼
-                         ┌──────────────────────┐
-                         │ Fare & Payment       │
-                         │ Service :8084        │
-                         └──────────┬───────────┘
-                                    │
-                                    ▼
-                         ┌──────────────────────┐
-                         │ MongoDB              │
-                         │ ridelink_payment_db  │
-                         └──────────┬───────────┘
+                          ┌─────────────────────────────────────┐
+                          │         Central API Index           │
+                          │          (docs/index.html)          │
+                          └──────────────────┬──────────────────┘
+                                             │
+                       ┌─────────────────────┼─────────────────────┐
+                       │                     │                     │
+                       ▼                     ▼                     ▼
+              ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
+              │ Account Service │   │Driver & Vehicle │   │ Ride Management │
+              │      :8081      │   │ Service :8082   │   │  Service :8083  │
+              └────────┬────────┘   └────────┬────────┘   └────────┬────────┘
+                       │                     │                     │
+                       │ REST                │ REST                │ REST
+                       │ (Validate Auth)     │ (Query Drivers)     │ (Calculate / Pay)
+                       │                     │                     │
+                       ▼                     ▼                     ▼
+              ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
+              │     MongoDB     │   │     MongoDB     │   │     MongoDB     │
+              │ridelink_account │   │ ridelink_driver │   │  ridelink_ride  │
+              │      _db        │   │      _db        │   │       _db       │
+              └─────────────────┘   └─────────────────┘   └────────┬────────┘
+                                                                   │
+                                                                   │ REST (HTTP)
+                                                                   ▼
+                                                          ┌─────────────────┐
+                                                          │ Fare & Payment  │
+                                                          │  Service :8084  │
+                                                          └────────┬────────┘
+                                                                   │
+                                                                   ▼
+                                                          ┌─────────────────┐
+                                                          │     MongoDB     │
+                                                          │ridelink_payment │
+                                                          │      _db        │
+                                                          └─────────────────┘
 ```
 
-> **Important Architecture Rule:**  
-> Each microservice owns its own database:
-> - **Account Service** $\rightarrow$ `ridelink_account_db`
-> - **Driver & Vehicle Service** $\rightarrow$ `ridelink_driver_db`
-> - **Ride Management Service** $\rightarrow$ `ridelink_ride_db`
-> - **Fare & Payment Service** $\rightarrow$ `ridelink_payment_db`
->
-> A service must **never** directly query or modify another service's database. Inter-service communication must happen through documented APIs.
+### 🔒 Database Isolation Policy
+Each microservice strictly owns and manages its own persistence store:
+- **Account Service** $\rightarrow$ `ridelink_account_db`
+- **Driver & Vehicle Service** $\rightarrow$ `ridelink_driver_db`
+- **Ride Management Service** $\rightarrow$ `ridelink_ride_db`
+- **Fare & Payment Service** $\rightarrow$ `ridelink_payment_db`
+
+**Strict Architectural Invariant:**  
+A service **never** directly accesses or imports repositories of another service's database. For instance, the Ride Management Service never connects to `ridelink_driver_db` or `ridelink_account_db`; all cross-boundary interactions occur strictly via synchronous HTTP/REST APIs.
+
+---
+
+## 🧩 Microservices Specification
+
+| Service | Port | Database | Primary Responsibility | Swagger UI URL |
+| :--- | :---: | :--- | :--- | :--- |
+| **Account Service** | `8081` | `ridelink_account_db` | User registration, login, JWT token issuance, user profile management, RBAC (`PASSENGER`, `DRIVER`, `ADMIN`), account status | [http://localhost:8081/swagger-ui/index.html](http://localhost:8081/swagger-ui/index.html) |
+| **Driver & Vehicle Service** | `8082` | `ridelink_driver_db` | Driver operational profile, vehicle registration & specs, real-time availability toggle, simulated location & proximity matching | [http://localhost:8082/swagger-ui/index.html](http://localhost:8082/swagger-ui/index.html) |
+| **Ride Management Service** | `8083` | `ridelink_ride_db` | Ride booking requests, driver assignment, ride lifecycle state machine, cancellation rules, passenger/driver trip history | [http://localhost:8083/swagger-ui/index.html](http://localhost:8083/swagger-ui/index.html) |
+| **Fare & Payment Service** | `8084` | `ridelink_payment_db` | Distance/duration & surge fare estimation, payment transaction processing, simulated payments, transaction receipts | [http://localhost:8084/swagger-ui/index.html](http://localhost:8084/swagger-ui/index.html) |
 
 ---
 
@@ -84,392 +99,233 @@ RideLink consists of four core microservices:
 ```
 RideLink-Backend/
 │
-├── account-service/
+├── account-service/                  # Member 1: User & Authentication Domain
 │   ├── src/
 │   ├── pom.xml
-│   ├── README.md
-│   └── .env.example
+│   └── README.md
 │
-├── driver-vehicle-service/
+├── driver-vehicle-service/           # Member 2: Driver & Vehicle Operations
 │   ├── src/
 │   ├── pom.xml
-│   ├── README.md
-│   └── .env.example
+│   └── README.md
 │
-├── ride-management-service/
+├── ride-management-service/          # Member 3: Ride Lifecycle Domain
 │   ├── src/
 │   ├── pom.xml
-│   ├── README.md
-│   └── .env.example
+│   └── README.md
 │
-├── fare-payment-service/
+├── fare-payment-service/             # Member 4: Fare & Payment Domain
 │   ├── src/
 │   ├── pom.xml
-│   ├── README.md
-│   └── .env.example
+│   └── README.md
 │
 ├── docs/
-│   ├── architecture/
-│   ├── sequence-diagrams/
-│   └── api/
+│   └── index.html                    # Central API Documentation Portal
 │
 ├── postman/
-│   ├── RideLink.postman_collection.json
-│   └── RideLink.postman_environment.json
+│   └── RideLink.postman_collection.json # Group Postman Collection & Workflows
 │
 ├── .github/
 │   └── workflows/
-│       └── ci.yml
+│       └── ci.yml                    # Automated GitHub Actions CI Pipeline
 │
-├── .gitignore
-└── README.md
+├── pom.xml                           # Root Maven Aggregator POM
+├── .env.example                      # Central Environment Variables Template
+├── .gitignore                        # Git exclusion rules
+├── start-all.bat                     # Windows Multi-Service Startup Script
+├── start-all.sh                      # Unix/macOS Multi-Service Startup Script
+├── stop-services.ps1                 # Service shutdown script for Windows
+└── README.md                         # Comprehensive System Documentation
 ```
 
 ---
 
-## 🧩 Microservices
+## 🛠️ Root Maven Aggregator
 
-### 1. Account Service
+The root [pom.xml](file:///c:/Users/Jayanga/Desktop/all%20in%20one/micro-services-assignment/pom.xml) is configured as a Maven aggregator POM (`<packaging>pom</packaging>`).
 
-- **Port:** `8081`
-- **Database:** `ridelink_account_db`
-- **Swagger UI:** [http://localhost:8081/swagger-ui/index.html](http://localhost:8081/swagger-ui/index.html)
-
-#### Responsibility
-The Account Service manages passenger registration, driver registration, authentication, JWT token issuance, user profiles, role management, account status, and user CRUD operations.
-
-#### Main Roles & Statuses
-- **Roles:** `PASSENGER`, `DRIVER`, `ADMIN`
-- **Account Status:** `ACTIVE`, `SUSPENDED`, `DEACTIVATED`
-
-#### Main API Groups
-```http
-POST   /api/v1/auth/register
-POST   /api/v1/auth/login
-
-POST   /api/v1/users
-GET    /api/v1/users
-GET    /api/v1/users/{id}
-PUT    /api/v1/users/{id}
-DELETE /api/v1/users/{id}
-
-GET    /api/v1/users/me
-PUT    /api/v1/users/me
-
-PATCH  /api/v1/users/{id}/status
-```
-
-#### Security
-- BCrypt password hashing
-- JWT authentication & Role-Based Access Control (RBAC)
-- Protected user endpoints & Admin-only administrative operations
-- Passwords are never returned in API responses
-- Secrets loaded through environment variables
-
----
-
-### 2. Driver & Vehicle Service
-
-- **Port:** `8082`
-- **Database:** `ridelink_driver_db`
-- **Swagger UI:** [http://localhost:8082/swagger-ui/index.html](http://localhost:8082/swagger-ui/index.html)
-
-#### Responsibility
-The Driver & Vehicle Service manages driver operational profiles, driver availability, vehicle information, service areas, simulated current driver location, and eligible available-driver retrieval.
-
-#### Main Concepts
-- Driver Profile
-- Vehicle Information
-- Driver Availability
-- Service Area
-- Current Location (Simulated)
-
-The service provides APIs required by the Ride Management Service to identify eligible available drivers.
-
----
-
-### 3. Ride Management Service
-
-- **Port:** `8083`
-- **Database:** `ridelink_ride_db`
-- **Swagger UI:** [http://localhost:8083/swagger-ui/index.html](http://localhost:8083/swagger-ui/index.html)
-
-#### Responsibility
-The Ride Management Service manages ride requests, pickup location, destination, driver assignment, ride lifecycle, ride retrieval, ride cancellation, and ride completion.
-
-#### Ride Lifecycle
-```
-REQUESTED ──> ASSIGNED ──> ACCEPTED ──> IN_PROGRESS ──> COMPLETED
-```
-**Cancellation Path:**
-- `REQUESTED` $\rightarrow$ `CANCELLED`
-- `ASSIGNED` $\rightarrow$ `CANCELLED`
-- `ACCEPTED` $\rightarrow$ `CANCELLED`
-
-The service validates state transitions and rejects invalid lifecycle operations.
-
----
-
-### 4. Fare & Payment Service
-
-- **Port:** `8084`
-- **Database:** `ridelink_payment_db`
-- **Swagger UI:** [http://localhost:8084/swagger-ui/index.html](http://localhost:8084/swagger-ui/index.html)
-
-#### Responsibility
-The Fare & Payment Service manages fare estimation, final fare calculation, documented fare rules, simulated payment recording, payment status, receipt generation, and receipt retrieval.
-
-#### Example Payment States
-- `PENDING`
-- `SUCCESS`
-- `FAILED`
-
----
-
-## 🔄 Core RideLink Workflows
-
-### Workflow 1 – Account and Access
-```
-User ──> Register ──> Account Service ──> Validate & Hash Password ──> MongoDB
-User ──> Login ──> Account Service ──> Verify Credentials & Generate JWT
-```
-
-### Workflow 2 – Driver Preparation
-```
-Driver ──> Account Service ──> Driver & Vehicle Service
- (Configure Driver Profile, Vehicle Information, Availability, Service Area, Current Location)
-```
-
-### Workflow 3 – Fare Estimation
-```
-Passenger ──> Ride Management Service (Pickup, Destination) ──> Fare & Payment Service (Estimate Fare)
-```
-
-### Workflow 4 – Ride Request and Driver Assignment
-```
-Passenger ──> Ride Management Service (Create Ride) ──> Driver & Vehicle Service (Find Eligible Driver) ──> Ride Management Service (Assign Driver)
-```
-
-### Workflow 5 – Ride Lifecycle
-```
-REQUESTED ──> ASSIGNED ──> ACCEPTED ──> IN_PROGRESS ──> COMPLETED
-  │             │            │
-  └─────────────┼────────────┘ ──> CANCELLED
-```
-
-### Workflow 6 – Completion and Payment
-```
-Ride Completed ──> Fare & Payment Service
-                    ├── Calculate final fare
-                    ├── Record simulated payment
-                    ├── Update payment status
-                    └── Generate receipt
-```
-
----
-
-## 🔗 Inter-Service Communication
-
-RideLink uses REST-based synchronous communication between services where cross-service information is required.
-
-- **Interaction 1:** Ride Management Service $\xrightarrow{\text{GET eligible drivers}}$ Driver & Vehicle Service
-- **Interaction 2:** Ride Management Service $\xrightarrow{\text{POST fare estimation}}$ Fare & Payment Service
-
-### Rules for Inter-Service Communication
-1. Use stable IDs between services.
-2. Do not share MongoDB collections between services.
-3. Do not directly access another service's database.
-4. Validate inter-service requests and responses.
-5. Handle timeout and error scenarios appropriately.
-6. Document API contracts.
-
----
-
-## 🔐 Security
-
-- **Authentication:** JWT access tokens issued by Account Service on login (`Authorization: Bearer <JWT_TOKEN>`).
-- **Authorization:** Role-Based Access Control (`PASSENGER`, `DRIVER`, `ADMIN`).
-- **Password Security:** Passwords hashed with BCrypt, never stored as plaintext, never returned in API responses, and never logged.
-- **Secrets Management:** Configured via environment variables (`MONGODB_URI`, `JWT_SECRET`, `JWT_EXPIRATION`). Real secrets are never committed to Git.
-
----
-
-## 🗄️ Database Design
-
-A single MongoDB Atlas cluster may host the four independent databases:
-
-```
-ridelink
-├── ridelink_account_db ──> users
-├── ridelink_driver_db  ──> drivers, vehicles
-├── ridelink_ride_db    ──> rides
-└── ridelink_payment_db ──> fares, payments
-```
-
----
-
-## 🧪 Validation and Error Handling
-
-All services validate incoming requests using Jakarta Bean Validation (`@NotBlank`, `@NotNull`, `@Email`, `@Size`, `@Pattern`) and custom business rules.
-
-### Standard HTTP Status Codes
-
-| Status | Meaning |
-| --- | --- |
-| `200` | Successful operation |
-| `201` | Resource created |
-| `204` | Successful operation with no response body |
-| `400` | Invalid request / validation failure |
-| `401` | Authentication required or invalid |
-| `403` | Insufficient permissions |
-| `404` | Resource not found |
-| `409` | Resource conflict |
-| `500` | Unexpected server error |
-
-### Error Response Format
-```json
-{
-  "timestamp": "2026-09-28T10:00:00Z",
-  "status": 400,
-  "error": "Validation Failed",
-  "message": "Request validation failed",
-  "path": "/api/v1/example",
-  "fieldErrors": {
-    "email": "Invalid email format"
-  }
-}
-```
-
----
-
-## ❌ Negative Scenarios
-
-1. **Duplicate Registration:** Registering with an existing email returns `409 Conflict`.
-2. **Unauthorized Role:** Passenger attempting an Admin operation returns `403 Forbidden`.
-3. **Invalid JWT / Missing Auth:** Returns `401 Unauthorized`.
-4. **Invalid Ride State Transition:** Transitioning out of sequence returns `400 Bad Request`.
-5. **No Eligible Driver:** Returns `404 Not Found` or `400 Bad Request` depending on state.
-
----
-
-## 📖 API Documentation
-
-Swagger UI URLs:
-- **Account Service:** [http://localhost:8081/swagger-ui/index.html](http://localhost:8081/swagger-ui/index.html)
-- **Driver & Vehicle Service:** [http://localhost:8082/swagger-ui/index.html](http://localhost:8082/swagger-ui/index.html)
-- **Ride Management Service:** [http://localhost:8083/swagger-ui/index.html](http://localhost:8083/swagger-ui/index.html)
-- **Fare & Payment Service:** [http://localhost:8084/swagger-ui/index.html](http://localhost:8084/swagger-ui/index.html)
-
-OpenAPI JSON endpoint: `/v3/api-docs`
-
----
-
-## 📮 Postman
-
-A shared Postman collection is maintained for the complete system:
-
-```
-RideLink/
-├── 01 - Account Service
-│   ├── Register Passenger
-│   ├── Register Driver
-│   ├── Login
-│   ├── Get Profile
-│   ├── Update Profile
-│   ├── Get Users
-│   └── Account Status
-├── 02 - Driver & Vehicle Service
-│   ├── Driver CRUD
-│   ├── Vehicle CRUD
-│   ├── Availability
-│   └── Eligible Drivers
-├── 03 - Ride Management Service
-│   ├── Create Ride
-│   ├── Assign Driver
-│   ├── Accept Ride
-│   ├── Start Ride
-│   ├── Complete Ride
-│   └── Cancel Ride
-└── 04 - Fare & Payment Service
-    ├── Estimate Fare
-    ├── Calculate Final Fare
-    ├── Create Payment
-    ├── Payment Status
-    └── Receipt
-```
-
-**Environment Variables:**
-`accountBaseUrl`, `driverBaseUrl`, `rideBaseUrl`, `paymentBaseUrl`, `jwtToken`, `userId`, `driverId`, `rideId`, `paymentId`.
-
----
-
-## 🌿 Git Workflow & Continuous Integration
-
-- **Main Branches:** `main`, `develop`
-- **Feature Branches:** `feature/member1-account-service`, `feature/member2-driver-vehicle-service`, `feature/member3-ride-management-service`, `feature/member4-fare-payment-service`
-- **CI Pipeline:** `.github/workflows/ci.yml` (Java 25 setup, Maven build, automated testing across all microservices).
-
----
-
-## 🚀 Running the Services Locally
-
-Each service can be built and run independently:
+It allows building, packaging, and testing all four microservices with single root commands while preserving their independent executable status and dependencies:
 
 ```bash
-# Account Service (Port 8081)
-cd account-service
-mvn clean test
-mvn spring-boot:run
+# Execute unit & slice tests across all 4 microservices
+./mvnw clean test
 
-# Driver & Vehicle Service (Port 8082)
-cd driver-vehicle-service
-mvn clean test
-mvn spring-boot:run
+# Build executable production JARs for all 4 microservices
+./mvnw clean package
+```
 
-# Ride Management Service (Port 8083)
-cd ride-management-service
-mvn clean test
-mvn spring-boot:run
+> **Note:** The root POM is strictly an aggregator. It does not merge the services into a single monolithic JAR or combine their configurations. Each service continues to possess its own `@SpringBootApplication`, port, configuration, and build artifact.
 
-# Fare & Payment Service (Port 8084)
-cd fare-payment-service
-mvn clean test
-mvn spring-boot:run
+---
+
+## 📖 Central API Documentation Index
+
+A clean, responsive, framework-free documentation index is provided at:
+📂 [docs/index.html](file:///c:/Users/Jayanga/Desktop/all%20in%20one/micro-services-assignment/docs/index.html)
+
+### Features:
+- Title: **RideLink Backend API Documentation**
+- Subtitle: **IT3130 Application Development Group Assignment**
+- Four distinct cards representing each microservice with its assigned port, database, and domain description.
+- Direct links to:
+  - **Swagger UI**: `/swagger-ui/index.html`
+  - **OpenAPI 3.0 JSON specification**: `/v3/api-docs`
+
+---
+
+## 🚀 Running the System
+
+### Option A: Automated Multi-Service Startup Script
+
+#### Windows:
+```cmd
+start-all.bat
+```
+*(Launches each microservice in its own separate command prompt window).*
+
+To stop all running services on Windows:
+```powershell
+powershell -ExecutionPolicy Bypass -File .\stop-services.ps1
+```
+
+#### Unix / macOS:
+```bash
+chmod +x start-all.sh
+./start-all.sh
 ```
 
 ---
 
-## 👥 Team Responsibilities
+### Option B: Running Services Individually
 
-| Member | Service | Main Responsibility |
-| --- | --- | --- |
-| **Member 1** | Account Service | Authentication, users, profiles, roles, account status |
-| **Member 2** | Driver & Vehicle Service | Driver profiles, vehicles, availability, location |
-| **Member 3** | Ride Management Service | Ride requests, assignment, lifecycle |
-| **Member 4** | Fare & Payment Service | Fare estimation, final fare, payment, receipts |
+Open four separate terminal windows and run:
+
+```bash
+# Terminal 1 - Account Service (Port 8081)
+cd account-service
+..\mvnw spring-boot:run
+
+# Terminal 2 - Driver & Vehicle Service (Port 8082)
+cd driver-vehicle-service
+..\mvnw spring-boot:run
+
+# Terminal 3 - Ride Management Service (Port 8083)
+cd ride-management-service
+..\mvnw spring-boot:run
+
+# Terminal 4 - Fare & Payment Service (Port 8084)
+cd fare-payment-service
+..\mvnw spring-boot:run
+```
 
 ---
 
-## 🏁 Final Project Status
+## ⚙️ Environment Variables
 
-- [ ] Account Service
-- [ ] Driver & Vehicle Service
-- [ ] Ride Management Service
-- [ ] Fare & Payment Service
-- [ ] MongoDB Databases
-- [ ] REST APIs
-- [ ] Inter-service Communication
-- [ ] JWT Authentication
-- [ ] RBAC
-- [ ] Validation
-- [ ] Exception Handling
-- [ ] Swagger/OpenAPI
-- [ ] Postman Collection
-- [ ] Unit Tests
-- [ ] Integration Tests
-- [ ] CI Pipeline
-- [ ] Architecture Diagram
-- [ ] Sequence Diagram
-- [ ] README
-- [ ] Git/PR Workflow
-- [ ] Final Demo
+A template file [`.env.example`](file:///c:/Users/Jayanga/Desktop/all%20in%20one/micro-services-assignment/.env.example) is provided at the root:
+
+| Variable | Default / Example | Purpose |
+| --- | --- | --- |
+| `ACCOUNT_SERVICE_PORT` | `8081` | HTTP listening port for Account Service |
+| `DRIVER_SERVICE_PORT` | `8082` | HTTP listening port for Driver Service |
+| `RIDE_SERVICE_PORT` | `8083` | HTTP listening port for Ride Service |
+| `PAYMENT_SERVICE_PORT` | `8084` | HTTP listening port for Fare & Payment Service |
+| `ACCOUNT_MONGODB_URI` | `mongodb+srv://.../ridelink_account_db` | MongoDB Atlas URI for Account Service |
+| `DRIVER_MONGODB_URI` | `mongodb+srv://.../ridelink_driver_db` | MongoDB Atlas URI for Driver Service |
+| `RIDE_MONGODB_URI` | `mongodb+srv://.../ridelink_ride_db` | MongoDB Atlas URI for Ride Service |
+| `PAYMENT_MONGODB_URI` | `mongodb+srv://.../ridelink_payment_db` | MongoDB Atlas URI for Fare & Payment Service |
+| `ACCOUNT_SERVICE_URL` | `http://localhost:8081` | REST URL used by Driver & Ride Services |
+| `DRIVER_SERVICE_URL` | `http://localhost:8082` | REST URL used by Ride Management Service |
+| `PAYMENT_SERVICE_URL` | `http://localhost:8084` | REST URL used by Ride Management Service |
+| `JWT_SECRET` | *Secret Key (256+ bits)* | HMAC-SHA256 signature key for JWT tokens |
+| `JWT_EXPIRATION_MS` | `86400000` | JWT token validity in milliseconds (24h) |
+
+---
+
+## 🔄 End-to-End Integrated Demonstration Workflow
+
+The group Postman collection ([`postman/RideLink.postman_collection.json`](file:///c:/Users/Jayanga/Desktop/all%20in%20one/micro-services-assignment/postman/RideLink.postman_collection.json)) contains an executable end-to-end workflow simulating a complete ride lifecycle across all four microservices:
+
+```
+[1] Register Passenger ──> [2] Login & Get JWT ──> [3] Calculate Fare Estimate
+         (Account)                  (Account)                   (Payment)
+                                                                    │
+[6] Accept Ride <───────── [5] Assign Driver <───── [4] Book Ride ◄─┘
+      (Ride)                     (Ride)                  (Ride)
+         │
+         ▼
+[7] Start Ride ──────────> [8] Complete Ride ────> [9] Process Payment ──> [10] View Receipt
+      (Ride)                     (Ride)                    (Payment)              (Payment)
+```
+
+1. **Step 1 - Register Passenger (`Account Service` - `8081`):**  
+   `POST /api/v1/auth/register` creates passenger account with encrypted password.
+2. **Step 2 - Login Passenger (`Account Service` - `8081`):**  
+   `POST /api/v1/auth/login` verifies credentials and returns JWT bearer token.
+3. **Step 3 - Fare Estimation (`Fare & Payment Service` - `8084`):**  
+   `POST /api/fares/calculate` calculates estimated trip fare based on GPS coordinates.
+4. **Step 4 - Request Ride (`Ride Management Service` - `8083`):**  
+   `POST /api/v1/rides` registers trip in `REQUESTED` state with passenger reference.
+5. **Step 5 - Assign Driver (`Ride Management Service` - `8083`):**  
+   `POST /api/v1/rides/{id}/assign` links an eligible driver from Driver Service; state moves to `ASSIGNED`.
+6. **Step 6 - Driver Accepts Ride (`Ride Management Service` - `8083`):**  
+   `PATCH /api/v1/rides/{id}/accept` transitions status to `ACCEPTED`.
+7. **Step 7 - Driver Starts Ride (`Ride Management Service` - `8083`):**  
+   `PATCH /api/v1/rides/{id}/start` transitions status to `IN_PROGRESS`.
+8. **Step 8 - Driver Completes Ride (`Ride Management Service` - `8083`):**  
+   `PATCH /api/v1/rides/{id}/complete` finalizes trip to `COMPLETED`.
+9. **Step 9 - Process Payment (`Fare & Payment Service` - `8084`):**  
+   `POST /api/payments` records simulated card transaction for the completed ride.
+10. **Step 10 - Retrieve Receipt (`Fare & Payment Service` - `8084`):**  
+    `GET /api/receipts/ride/{rideId}` returns payment receipt and itemized breakdown.
+
+---
+
+## 🧪 Testing and Quality Assurance
+
+### Test Suite Execution
+Automated unit, service, and web layer tests are implemented across all four services:
+- **Account Service**: 17 tests (Auth, UserController, Token validation)
+- **Driver & Vehicle Service**: 21 tests (DriverService, VehicleService, Availability, Proximity)
+- **Ride Management Service**: 37 tests (RideService, RideValidationService, RideAssignmentService, RideController)
+- **Fare & Payment Service**: 14 tests (FareCalculationService, PaymentService, ReceiptService)
+- **Total Test Count**: **89 tests**, **100% passing**, **0 failures**.
+
+```bash
+# Run all tests via Maven reactor
+./mvnw clean test
+```
+
+---
+
+## 👥 Team Responsibilities & Git Boundaries
+
+| Member | Service Directory | Assigned Port | Primary Business Domain |
+| :--- | :--- | :---: | :--- |
+| **Member 1** | `account-service` | `8081` | Authentication, JWT, Users, Profiles, RBAC |
+| **Member 2** | `driver-vehicle-service` | `8082` | Driver Profiles, Vehicles, Availability, Locations |
+| **Member 3** | `ride-management-service` | `8083` | Ride Requests, Driver Assignment, State Machine |
+| **Member 4** | `fare-payment-service` | `8084` | Fare Estimation, Transactions, Receipts |
+
+Root-level files (`pom.xml`, `README.md`, `docs/`, `postman/`, `.github/`, scripts) represent shared integration infrastructure and do not infringe on individual member code ownership.
+
+---
+
+## 🏁 Final Integration Audit Status
+
+- [x] Exactly four business microservices preserved
+- [x] All microservices use Java 25 & Spring Boot 3.5
+- [x] Four independent MongoDB databases with strict isolation
+- [x] No direct cross-service database access or foreign repository imports
+- [x] Standardized service ports (8081, 8082, 8083, 8084)
+- [x] Individual OpenAPI / Swagger UI accessible on all services
+- [x] Central API documentation landing page created (`docs/index.html`)
+- [x] Root Maven aggregator build functional (`mvn clean package`)
+- [x] Root Maven aggregator test suite functional (`mvn clean test` - 89/89 passing)
+- [x] JWT authentication and RBAC security intact
+- [x] Jakarta Bean Validation functional across all domains
+- [x] Downstream REST failure handling and resilience implemented
+- [x] Zero committed secrets or credentials (`.env.example` provided)
+- [x] Organized group Postman collection with end-to-end workflow
+- [x] GitHub Actions CI workflow configured (`.github/workflows/ci.yml`)
+- [x] Zero MERN / Node.js / Express components introduced

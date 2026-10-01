@@ -1,0 +1,851 @@
+{
+	"info": {
+		"_postman_id": "8e2df807-7d84-482f-8973-b3c162eb019a",
+		"name": "RideLink Microservices API Collection",
+		"description": "Comprehensive Postman Collection for the RideLink backend microservices architecture (Account Service, Driver & Vehicle Service, Ride Management Service, and Fare & Payment Service) including an end-to-end integrated workflow demonstration.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01 - Account Service",
+			"item": [
+				{
+					"name": "Register Passenger",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Alice Passenger\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"Password123!\",\n  \"phone\": \"+94771234567\",\n  \"role\": \"PASSENGER\"\n}"
+						},
+						"url": {
+							"raw": "{{accountBaseUrl}}/api/v1/auth/register",
+							"host": [
+								"{{accountBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Passenger",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{accountBaseUrl}}/api/v1/auth/login",
+							"host": [
+								"{{accountBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Driver User Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Bob Driver\",\n  \"email\": \"bob.driver@example.com\",\n  \"password\": \"Password123!\",\n  \"phone\": \"+94779876543\",\n  \"role\": \"DRIVER\"\n}"
+						},
+						"url": {
+							"raw": "{{accountBaseUrl}}/api/v1/auth/register",
+							"host": [
+								"{{accountBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{accountBaseUrl}}/api/v1/users/profile",
+							"host": [
+								"{{accountBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "02 - Driver & Vehicle Service",
+			"item": [
+				{
+					"name": "Create Driver Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{driverId}}\",\n  \"licenseNumber\": \"B1234567\",\n  \"experienceYears\": 5,\n  \"serviceArea\": \"Colombo\"\n}"
+						},
+						"url": {
+							"raw": "{{driverBaseUrl}}/api/v1/drivers",
+							"host": [
+								"{{driverBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drivers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Vehicle",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"driverId\": \"{{driverId}}\",\n  \"make\": \"Toyota\",\n  \"model\": \"Prius\",\n  \"year\": 2021,\n  \"licensePlate\": \"CBA-1234\",\n  \"vehicleType\": \"CAR\",\n  \"capacity\": 4\n}"
+						},
+						"url": {
+							"raw": "{{driverBaseUrl}}/api/v1/vehicles",
+							"host": [
+								"{{driverBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"vehicles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Driver Availability",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"available\": true\n}"
+						},
+						"url": {
+							"raw": "{{driverBaseUrl}}/api/v1/drivers/me/availability",
+							"host": [
+								"{{driverBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drivers",
+								"me",
+								"availability"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Driver Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{driverBaseUrl}}/api/v1/drivers/{{driverId}}",
+							"host": [
+								"{{driverBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drivers",
+								"{{driverId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "03 - Ride Management Service",
+			"item": [
+				{
+					"name": "Request Ride",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"passengerId\": \"{{passengerId}}\",\n  \"pickupLocation\": {\n    \"address\": \"Colombo Fort Station\",\n    \"latitude\": 6.9344,\n    \"longitude\": 79.8540\n  },\n  \"dropoffLocation\": {\n    \"address\": \"Bambalapitiya Junction\",\n    \"latitude\": 6.8938,\n    \"longitude\": 79.8561\n  },\n  \"vehicleType\": \"CAR\",\n  \"paymentMethod\": \"CARD\",\n  \"estimatedFare\": 750.00\n}"
+						},
+						"url": {
+							"raw": "{{rideBaseUrl}}/api/v1/rides",
+							"host": [
+								"{{rideBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ride By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{rideBaseUrl}}/api/v1/rides/{{rideId}}",
+							"host": [
+								"{{rideBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"{{rideId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Driver to Ride",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"driverId\": \"{{driverId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{rideBaseUrl}}/api/v1/rides/{{rideId}}/assign",
+							"host": [
+								"{{rideBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"{{rideId}}",
+								"assign"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Ride (Driver)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"driverId\": \"{{driverId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{rideBaseUrl}}/api/v1/rides/{{rideId}}/accept",
+							"host": [
+								"{{rideBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"{{rideId}}",
+								"accept"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Start Ride (Driver)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"driverId\": \"{{driverId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{rideBaseUrl}}/api/v1/rides/{{rideId}}/start",
+							"host": [
+								"{{rideBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"{{rideId}}",
+								"start"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Complete Ride (Driver)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"driverId\": \"{{driverId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{rideBaseUrl}}/api/v1/rides/{{rideId}}/complete",
+							"host": [
+								"{{rideBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"{{rideId}}",
+								"complete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "04 - Fare & Payment Service",
+			"item": [
+				{
+					"name": "Calculate Ride Fare",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pickupLatitude\": 6.9344,\n  \"pickupLongitude\": 79.8540,\n  \"dropoffLatitude\": 6.8938,\n  \"dropoffLongitude\": 79.8561,\n  \"rideType\": \"STANDARD\",\n  \"surgeMultiplier\": 1.0\n}"
+						},
+						"url": {
+							"raw": "{{paymentBaseUrl}}/api/fares/calculate",
+							"host": [
+								"{{paymentBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"fares",
+								"calculate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Process Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"rideId\": \"{{rideId}}\",\n  \"passengerId\": \"{{passengerId}}\",\n  \"fareAmount\": 750.00,\n  \"paymentMethod\": \"CARD\"\n}"
+						},
+						"url": {
+							"raw": "{{paymentBaseUrl}}/api/payments",
+							"host": [
+								"{{paymentBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"payments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payment by Ride ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{paymentBaseUrl}}/api/payments/ride/{{rideId}}",
+							"host": [
+								"{{paymentBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"payments",
+								"ride",
+								"{{rideId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ride Receipt",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{paymentBaseUrl}}/api/receipts/ride/{{rideId}}",
+							"host": [
+								"{{paymentBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"receipts",
+								"ride",
+								"{{rideId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "05 - Integrated Workflow",
+			"item": [
+				{
+					"name": "Step 1: Register Passenger (Account Service)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Workflow Passenger\",\n  \"email\": \"workflow.passenger@example.com\",\n  \"password\": \"Pass1234!\",\n  \"phone\": \"+94770000001\",\n  \"role\": \"PASSENGER\"\n}"
+						},
+						"url": {
+							"raw": "{{accountBaseUrl}}/api/v1/auth/register",
+							"host": [
+								"{{accountBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 2: Login Passenger & Capture JWT (Account Service)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"workflow.passenger@example.com\",\n  \"password\": \"Pass1234!\"\n}"
+						},
+						"url": {
+							"raw": "{{accountBaseUrl}}/api/v1/auth/login",
+							"host": [
+								"{{accountBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 3: Calculate Fare Estimate (Fare & Payment Service)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pickupLatitude\": 6.9344,\n  \"pickupLongitude\": 79.8540,\n  \"dropoffLatitude\": 6.8938,\n  \"dropoffLongitude\": 79.8561,\n  \"rideType\": \"STANDARD\",\n  \"surgeMultiplier\": 1.0\n}"
+						},
+						"url": {
+							"raw": "{{paymentBaseUrl}}/api/fares/calculate",
+							"host": [
+								"{{paymentBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"fares",
+								"calculate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 4: Request Ride (Ride Management Service)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"passengerId\": \"{{passengerId}}\",\n  \"pickupLocation\": {\n    \"address\": \"Colombo Fort Railway Station\",\n    \"latitude\": 6.9344,\n    \"longitude\": 79.8540\n  },\n  \"dropoffLocation\": {\n    \"address\": \"Majestic City, Bambalapitiya\",\n    \"latitude\": 6.8938,\n    \"longitude\": 79.8561\n  },\n  \"vehicleType\": \"CAR\",\n  \"paymentMethod\": \"CARD\",\n  \"estimatedFare\": 750.00\n}"
+						},
+						"url": {
+							"raw": "{{rideBaseUrl}}/api/v1/rides",
+							"host": [
+								"{{rideBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 5: Assign Driver to Ride (Ride Management Service)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"driverId\": \"{{driverId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{rideBaseUrl}}/api/v1/rides/{{rideId}}/assign",
+							"host": [
+								"{{rideBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"{{rideId}}",
+								"assign"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 6: Driver Accepts Ride (Ride Management Service)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"driverId\": \"{{driverId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{rideBaseUrl}}/api/v1/rides/{{rideId}}/accept",
+							"host": [
+								"{{rideBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"{{rideId}}",
+								"accept"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 7: Driver Starts Ride (Ride Management Service)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"driverId\": \"{{driverId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{rideBaseUrl}}/api/v1/rides/{{rideId}}/start",
+							"host": [
+								"{{rideBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"{{rideId}}",
+								"start"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 8: Driver Completes Ride (Ride Management Service)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"driverId\": \"{{driverId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{rideBaseUrl}}/api/v1/rides/{{rideId}}/complete",
+							"host": [
+								"{{rideBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"{{rideId}}",
+								"complete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 9: Process Final Ride Payment (Fare & Payment Service)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"rideId\": \"{{rideId}}\",\n  \"passengerId\": \"{{passengerId}}\",\n  \"fareAmount\": 750.00,\n  \"paymentMethod\": \"CARD\"\n}"
+						},
+						"url": {
+							"raw": "{{paymentBaseUrl}}/api/payments",
+							"host": [
+								"{{paymentBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"payments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 10: Retrieve Final Receipt (Fare & Payment Service)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{paymentBaseUrl}}/api/receipts/ride/{{rideId}}",
+							"host": [
+								"{{paymentBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"receipts",
+								"ride",
+								"{{rideId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "accountBaseUrl",
+			"value": "http://localhost:8081",
+			"type": "string"
+		},
+		{
+			"key": "driverBaseUrl",
+			"value": "http://localhost:8082",
+			"type": "string"
+		},
+		{
+			"key": "rideBaseUrl",
+			"value": "http://localhost:8083",
+			"type": "string"
+		},
+		{
+			"key": "paymentBaseUrl",
+			"value": "http://localhost:8084",
+			"type": "string"
+		},
+		{
+			"key": "jwtToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "passengerId",
+			"value": "670123456789abcdef012345",
+			"type": "string"
+		},
+		{
+			"key": "driverId",
+			"value": "670987654321fedcba543210",
+			"type": "string"
+		},
+		{
+			"key": "rideId",
+			"value": "670abcde0123456789abcdef",
+			"type": "string"
+		}
+	]
+}
