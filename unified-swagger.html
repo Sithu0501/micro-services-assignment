@@ -53,7 +53,7 @@
       <span class="badge">Unified Swagger Portal</span>
     </div>
     <div class="services-status">
-      Ports: <span>8081</span> (Account) &bull; <span>8082</span> (Driver & Vehicle)
+      Ports: <span>8081</span> (Account) &bull; <span>8082</span> (Driver & Vehicle) &bull; <span>8083</span> (Ride Management) &bull; <span>8084</span> (Fare & Payment)
     </div>
   </div>
 
@@ -66,7 +66,9 @@
       window.ui = SwaggerUIBundle({
         urls: [
           { name: "1. Account Service (Port 8081)", url: "http://localhost:8081/v3/api-docs" },
-          { name: "2. Driver & Vehicle Service (Port 8082)", url: "http://localhost:8082/v3/api-docs" }
+          { name: "2. Driver & Vehicle Service (Port 8082)", url: "http://localhost:8082/v3/api-docs" },
+          { name: "3. Ride Management Service (Port 8083)", url: "http://localhost:8083/v3/api-docs" },
+          { name: "4. Fare & Payment Service (Port 8084)", url: "http://localhost:8084/v3/api-docs" }
         ],
         "urls.primaryName": "1. Account Service (Port 8081)",
         dom_id: '#swagger-ui',

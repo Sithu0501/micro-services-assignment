@@ -5,13 +5,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * Custom UserDetails principal populated directly from verified JWT claims.
- * Allows controllers and services to access the user's ID, email, and roles statelessly.
+ * Allows controllers and services to access the user's ID, email, and roles
+ * statelessly.
  */
 public class UserPrincipal implements UserDetails {
 
@@ -76,8 +76,10 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         UserPrincipal that = (UserPrincipal) o;
         return Objects.equals(userId, that.userId);
     }
