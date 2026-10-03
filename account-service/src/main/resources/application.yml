@@ -13,8 +13,8 @@ spring:
     name: account-service
   data:
     mongodb:
-      # Required: set MONGODB_URI in the environment or .env (never commit real credentials).
-      uri: ${MONGODB_URI}
+      # Required: set ACCOUNT_MONGODB_URI in the environment or .env (never commit real credentials).
+      uri: ${ACCOUNT_MONGODB_URI}
       database: ridelink_account_db
       auto-index-creation: true
 

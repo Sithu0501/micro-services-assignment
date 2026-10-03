@@ -13,8 +13,8 @@ spring:
     name: driver-vehicle-service
   data:
     mongodb:
-      # Required: set MONGODB_URI in the environment or .env (never commit real credentials).
-      uri: ${MONGODB_URI}
+      # Required: set DRIVER_MONGODB_URI in the environment or .env (never commit real credentials).
+      uri: ${DRIVER_MONGODB_URI}
       database: ridelink_driver_db
       auto-index-creation: true
 
