@@ -31,7 +31,7 @@ public class JwtService {
     private static final Logger log = LoggerFactory.getLogger(JwtService.class);
     private final String secretKeyString;
 
-    public JwtService(@Value(value="${jwt.secret:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}") String secret) {
+    public JwtService(@Value(value="${jwt.secret}") String secret) {
         this.secretKeyString = secret;
     }
 

@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("JwtService Unit Tests")
 class JwtServiceTest {
 
-    private static final String TEST_SECRET = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+    private static final String TEST_SECRET = "test-only-jwt-secret-not-for-production-use-0123456789";
     private static final long TEST_EXPIRATION = 3600000; // 1 hour
 
     private JwtService jwtService;

@@ -6,12 +6,12 @@ spring:
     name: account-service-test
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb+srv://it24102971_db_user:4Yz9waUXesMwrAlz@ridelink.pcs3g0k.mongodb.net/ridelink_account_db?retryWrites=true&w=majority}
+      uri: mongodb://localhost:27017/ridelink_account_test
       database: ridelink_account_db
       auto-index-creation: false
 
 jwt:
-  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  secret: test-only-jwt-secret-not-for-production-use-0123456789
   expiration: 86400000
 
 # Disable admin bootstrap during tests to avoid startup side effects
@@ -19,7 +19,7 @@ admin:
   bootstrap:
     enabled: false
     email: admin@ridelink.com
-    password: Admin@RideLink2026!
+    password: Test-Only-Admin-Pass-1!
     full-name: RideLink Admin
     phone: +94770000001
 

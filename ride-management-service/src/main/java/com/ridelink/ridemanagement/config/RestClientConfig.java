@@ -41,5 +41,13 @@ public class RestClientConfig {
         requestFactory.setReadTimeout(Duration.ofMillis(this.serviceProperties.getDriver().getReadTimeoutMs()));
         return RestClient.builder().baseUrl(this.serviceProperties.getDriver().getUrl()).requestFactory((ClientHttpRequestFactory)requestFactory).build();
     }
+
+    @Bean
+    public RestClient paymentServiceRestClient() {
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(Duration.ofMillis(this.serviceProperties.getPayment().getConnectTimeoutMs()));
+        requestFactory.setReadTimeout(Duration.ofMillis(this.serviceProperties.getPayment().getReadTimeoutMs()));
+        return RestClient.builder().baseUrl(this.serviceProperties.getPayment().getUrl()).requestFactory((ClientHttpRequestFactory)requestFactory).build();
+    }
 }
 

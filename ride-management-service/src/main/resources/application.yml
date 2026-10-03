@@ -6,11 +6,15 @@ server:
     include-stacktrace: never
 
 spring:
+  config:
+    # Loads KEY=VALUE pairs from the git-ignored .env file in the service directory (if present).
+    import: optional:file:.env[.properties]
   application:
     name: ride-management-service
   data:
     mongodb:
-      uri: ${RIDE_MONGODB_URI:mongodb+srv://it24102971_db_user:4Yz9waUXesMwrAlz@ridelink.pcs3g0k.mongodb.net/ridelink_ride_db?retryWrites=true&w=majority}
+      # Required: set RIDE_MONGODB_URI in the environment or .env (never commit real credentials).
+      uri: ${RIDE_MONGODB_URI}
       database: ridelink_ride_db
       auto-index-creation: true
 
@@ -23,10 +27,14 @@ services:
     url: ${DRIVER_SERVICE_URL:http://localhost:8082}
     connect-timeout-ms: 3000
     read-timeout-ms: 5000
+  payment:
+    url: ${PAYMENT_SERVICE_URL:http://localhost:8084}
+    connect-timeout-ms: 3000
+    read-timeout-ms: 5000
 
 jwt:
-  # Secret key (HMAC-SHA256, minimum 256 bits). Shared secret matching Account Service.
-  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  # Required: shared HMAC-SHA256 secret (minimum 32 characters) matching Account Service, via JWT_SECRET or .env.
+  secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION:86400000}
 
 # Springdoc OpenAPI / Swagger UI configuration

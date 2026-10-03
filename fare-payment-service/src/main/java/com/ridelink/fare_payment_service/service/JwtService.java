@@ -16,7 +16,7 @@ import java.util.Date;
 public class JwtService {
     private final String secret;
 
-    public JwtService(@Value("${jwt.secret:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}") String secret) {
+    public JwtService(@Value("${jwt.secret}") String secret) {
         this.secret = secret;
     }
 

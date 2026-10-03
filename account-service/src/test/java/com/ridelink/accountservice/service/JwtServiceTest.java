@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class JwtServiceTest {
 
     private JwtService jwtService;
-    private final String secret = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+    private final String secret = "test-only-jwt-secret-not-for-production-use-0123456789";
     private final long expiration = 3600000; // 1 hour
 
     @BeforeEach

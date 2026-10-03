@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
  * <pre>
  *   ADMIN_BOOTSTRAP_ENABLED=true          # Set to false to disable
  *   ADMIN_EMAIL=admin@ridelink.com        # Bootstrap admin email
- *   ADMIN_PASSWORD=Admin@RideLink2026!    # Bootstrap admin password (min requirements apply)
+ *   ADMIN_PASSWORD=<choose-a-strong-password>  # Required to seed the admin (never commit it)
  *   ADMIN_FULL_NAME=RideLink Admin        # Bootstrap admin display name
  *   ADMIN_PHONE=+94770000001              # Bootstrap admin phone
  * </pre>
@@ -50,7 +50,7 @@ public class AdminBootstrapService implements ApplicationRunner {
     @Value("${admin.bootstrap.email:admin@ridelink.com}")
     private String adminEmail;
 
-    @Value("${admin.bootstrap.password:Admin@RideLink2026!}")
+    @Value("${admin.bootstrap.password:}")
     private String adminPassword;
 
     @Value("${admin.bootstrap.full-name:RideLink Admin}")
@@ -72,6 +72,11 @@ public class AdminBootstrapService implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         if (!bootstrapEnabled) {
             log.debug("Admin bootstrap is disabled. Skipping admin seed.");
+            return;
+        }
+
+        if (adminPassword == null || adminPassword.isBlank()) {
+            log.warn("Admin bootstrap skipped: ADMIN_PASSWORD is not configured.");
             return;
         }
 

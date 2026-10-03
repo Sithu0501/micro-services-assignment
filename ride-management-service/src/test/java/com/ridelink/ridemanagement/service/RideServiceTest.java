@@ -38,6 +38,7 @@
 package com.ridelink.ridemanagement.service;
 
 import com.ridelink.ridemanagement.client.AccountServiceClient;
+import com.ridelink.ridemanagement.client.FareServiceClient;
 import com.ridelink.ridemanagement.client.dto.AccountUserDto;
 import com.ridelink.ridemanagement.dto.LocationDto;
 import com.ridelink.ridemanagement.dto.request.CancelRideRequest;
@@ -45,6 +46,7 @@ import com.ridelink.ridemanagement.dto.request.CreateRideRequest;
 import com.ridelink.ridemanagement.dto.request.UpdateRideRequest;
 import com.ridelink.ridemanagement.dto.response.RideResponse;
 import com.ridelink.ridemanagement.dto.response.RideSummaryResponse;
+import com.ridelink.ridemanagement.exception.ExternalServiceException;
 import com.ridelink.ridemanagement.exception.InvalidRideRequestException;
 import com.ridelink.ridemanagement.exception.RideNotFoundException;
 import com.ridelink.ridemanagement.model.Location;
@@ -83,6 +85,8 @@ class RideServiceTest {
     private RideAssignmentService rideAssignmentService;
     @Mock
     private AccountServiceClient accountServiceClient;
+    @Mock
+    private FareServiceClient fareServiceClient;
     @InjectMocks
     private RideService rideService;
     private UserPrincipal passengerPrincipal;
@@ -211,6 +215,39 @@ class RideServiceTest {
         Assertions.assertNotNull(response);
         Assertions.assertEquals(RideStatus.COMPLETED, response.status());
         Assertions.assertNotNull(response.completedAt());
+    }
+
+    @Test
+    @DisplayName("Completing a ride requests the final fare from Fare & Payment using the trip distance")
+    void testCompleteRide_RequestsFinalFare() {
+        this.sampleRide.setStatus(RideStatus.IN_PROGRESS);
+        Mockito.when(this.rideRepository.findById("ride123")).thenReturn(Optional.of(this.sampleRide));
+        Mockito.when(this.rideRepository.save(ArgumentMatchers.any(Ride.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        this.rideService.completeRide("ride123", this.driverPrincipal);
+        // SLIIT Malabe -> Fort is roughly 15 km as the crow flies.
+        Mockito.verify(this.fareServiceClient).createFinalFare(ArgumentMatchers.eq("ride123"), ArgumentMatchers.doubleThat(km -> km > 10.0 && km < 20.0));
+    }
+
+    @Test
+    @DisplayName("Ride is still completed when Fare & Payment is unavailable")
+    void testCompleteRide_FareServiceDown_StillCompletes() {
+        this.sampleRide.setStatus(RideStatus.IN_PROGRESS);
+        Mockito.when(this.rideRepository.findById("ride123")).thenReturn(Optional.of(this.sampleRide));
+        Mockito.when(this.rideRepository.save(ArgumentMatchers.any(Ride.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        Mockito.doThrow(new ExternalServiceException("Fare & Payment Service is currently unavailable")).when(this.fareServiceClient).createFinalFare(ArgumentMatchers.anyString(), ArgumentMatchers.anyDouble());
+        RideResponse response = this.rideService.completeRide("ride123", this.driverPrincipal);
+        Assertions.assertEquals(RideStatus.COMPLETED, response.status());
+    }
+
+    @Test
+    @DisplayName("No final fare is requested when coordinates are missing")
+    void testCompleteRide_MissingCoordinates_SkipsFare() {
+        this.sampleRide.setStatus(RideStatus.IN_PROGRESS);
+        this.sampleRide.setPickupLocation(new Location("Unknown pickup", null, null));
+        Mockito.when(this.rideRepository.findById("ride123")).thenReturn(Optional.of(this.sampleRide));
+        Mockito.when(this.rideRepository.save(ArgumentMatchers.any(Ride.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        this.rideService.completeRide("ride123", this.driverPrincipal);
+        Mockito.verifyNoInteractions(this.fareServiceClient);
     }
 
     @Test

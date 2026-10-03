@@ -15,6 +15,7 @@
 package com.ridelink.ridemanagement.service;
 
 import com.ridelink.ridemanagement.client.AccountServiceClient;
+import com.ridelink.ridemanagement.client.FareServiceClient;
 import com.ridelink.ridemanagement.client.dto.AccountUserDto;
 import com.ridelink.ridemanagement.dto.request.AssignDriverRequest;
 import com.ridelink.ridemanagement.dto.request.CancelRideRequest;
@@ -31,7 +32,9 @@ import com.ridelink.ridemanagement.repository.RideRepository;
 import com.ridelink.ridemanagement.security.UserPrincipal;
 import com.ridelink.ridemanagement.service.RideAssignmentService;
 import com.ridelink.ridemanagement.service.RideValidationService;
+import com.ridelink.ridemanagement.util.GeoDistance;
 import java.time.Instant;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -48,12 +51,14 @@ public class RideService {
     private final RideValidationService rideValidationService;
     private final RideAssignmentService rideAssignmentService;
     private final AccountServiceClient accountServiceClient;
+    private final FareServiceClient fareServiceClient;
 
-    public RideService(RideRepository rideRepository, RideValidationService rideValidationService, RideAssignmentService rideAssignmentService, AccountServiceClient accountServiceClient) {
+    public RideService(RideRepository rideRepository, RideValidationService rideValidationService, RideAssignmentService rideAssignmentService, AccountServiceClient accountServiceClient, FareServiceClient fareServiceClient) {
         this.rideRepository = rideRepository;
         this.rideValidationService = rideValidationService;
         this.rideAssignmentService = rideAssignmentService;
         this.accountServiceClient = accountServiceClient;
+        this.fareServiceClient = fareServiceClient;
     }
 
     public RideResponse createRide(CreateRideRequest request, UserPrincipal principal, String bearerToken) {
@@ -153,6 +158,7 @@ public class RideService {
         ride.setCompletedAt(Instant.now());
         Ride saved = (Ride)this.rideRepository.save(ride);
         log.info("Ride {} completed by driver {}", (Object)rideId, (Object)principal.getUserId());
+        this.requestFinalFare(saved);
         return RideResponse.fromEntity(saved);
     }
 
@@ -194,6 +200,25 @@ public class RideService {
 
     private Ride findRideOrThrow(String rideId) {
         return (Ride)this.rideRepository.findById(rideId).orElseThrow(() -> new RideNotFoundException(rideId));
+    }
+
+    /**
+     * Asks the Fare & Payment Service to calculate the final fare for a completed ride.
+     * Failures are logged but never propagated: the trip is already completed and the
+     * final fare can be recreated later (the downstream call is idempotent).
+     */
+    private void requestFinalFare(Ride ride) {
+        Optional<Double> distanceKm = GeoDistance.kilometres(ride.getPickupLocation(), ride.getDestinationLocation());
+        if (distanceKm.isEmpty()) {
+            log.warn("Final fare not requested for ride {}: pickup/destination coordinates are incomplete", (Object)ride.getId());
+            return;
+        }
+        try {
+            this.fareServiceClient.createFinalFare(ride.getId(), distanceKm.get());
+        }
+        catch (RuntimeException e) {
+            log.warn("Final fare could not be created for ride {}: {}", (Object)ride.getId(), (Object)e.getMessage());
+        }
     }
 
     private void validateDriverOrAdmin(Ride ride, UserPrincipal principal, String action) {

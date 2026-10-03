@@ -12,6 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ServiceProperties {
     private ServiceEndpoint account = new ServiceEndpoint("http://localhost:8081", 3000, 5000);
     private ServiceEndpoint driver = new ServiceEndpoint("http://localhost:8082", 3000, 5000);
+    private ServiceEndpoint payment = new ServiceEndpoint("http://localhost:8084", 3000, 5000);
 
     public ServiceEndpoint getAccount() {
         return this.account;
@@ -27,6 +28,14 @@ public class ServiceProperties {
 
     public void setDriver(ServiceEndpoint driver) {
         this.driver = driver;
+    }
+
+    public ServiceEndpoint getPayment() {
+        return this.payment;
+    }
+
+    public void setPayment(ServiceEndpoint payment) {
+        this.payment = payment;
     }
 
     public static class ServiceEndpoint {
