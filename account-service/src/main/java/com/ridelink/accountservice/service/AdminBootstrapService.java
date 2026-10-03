@@ -82,25 +82,24 @@ public class AdminBootstrapService implements ApplicationRunner {
 
         final String normalizedEmail = adminEmail.trim().toLowerCase();
 
-        if (userRepository.existsByEmail(normalizedEmail)) {
-            log.info("Admin bootstrap: ADMIN account '{}' already exists. No action taken.", normalizedEmail);
-            return;
-        }
-
         // Hash password with BCrypt — plaintext is NEVER stored or logged
         final String encodedPassword = passwordEncoder.encode(adminPassword);
 
-        User admin = new User(
-                adminFullName.trim(),
-                normalizedEmail,
-                adminPhone.trim(),
-                encodedPassword,
-                Role.ADMIN,
-                AccountStatus.ACTIVE
-        );
-
-        User saved = userRepository.save(admin);
-        // Log only non-sensitive info — password NEVER appears in logs
-        log.info("Admin bootstrap: ADMIN account created successfully. ID: {}, Email: {}", saved.getId(), saved.getEmail());
+        userRepository.findByEmail(normalizedEmail).ifPresentOrElse(admin -> {
+            admin.setPassword(encodedPassword);
+            userRepository.save(admin);
+            log.info("Admin bootstrap: ADMIN account '{}' already exists. Password updated to match current configuration.", normalizedEmail);
+        }, () -> {
+            User admin = new User(
+                    adminFullName.trim(),
+                    normalizedEmail,
+                    adminPhone.trim(),
+                    encodedPassword,
+                    Role.ADMIN,
+                    AccountStatus.ACTIVE
+            );
+            User saved = userRepository.save(admin);
+            log.info("Admin bootstrap: ADMIN account created successfully. ID: {}, Email: {}", saved.getId(), saved.getEmail());
+        });
     }
 }

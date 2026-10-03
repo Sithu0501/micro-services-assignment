@@ -8,7 +8,7 @@ server:
 spring:
   config:
     # Loads KEY=VALUE pairs from the git-ignored .env file in the service directory (if present).
-    import: optional:file:.env[.properties]
+    import: optional:file:.env[.properties], optional:file:../.env[.properties]
   application:
     name: account-service
   data:
