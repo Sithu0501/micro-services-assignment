@@ -7,7 +7,6 @@
 package com.ridelink.ridemanagement.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ridelink.ridemanagement.client.dto.VehicleDto;
 import com.ridelink.ridemanagement.model.Location;
 
 @JsonIgnoreProperties(ignoreUnknown=true)

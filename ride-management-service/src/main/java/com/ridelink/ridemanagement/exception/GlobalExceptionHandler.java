@@ -21,20 +21,12 @@
  */
 package com.ridelink.ridemanagement.exception;
 
-import com.ridelink.ridemanagement.exception.DriverNotAvailableException;
-import com.ridelink.ridemanagement.exception.ErrorResponse;
-import com.ridelink.ridemanagement.exception.ExternalServiceException;
-import com.ridelink.ridemanagement.exception.InvalidRideRequestException;
-import com.ridelink.ridemanagement.exception.InvalidRideStateException;
-import com.ridelink.ridemanagement.exception.ResourceNotFoundException;
-import com.ridelink.ridemanagement.exception.RideNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;

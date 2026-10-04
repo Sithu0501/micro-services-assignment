@@ -57,7 +57,6 @@ import com.ridelink.ridemanagement.model.RideStatus;
 import com.ridelink.ridemanagement.repository.RideRepository;
 import com.ridelink.ridemanagement.security.JwtService;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -96,7 +95,6 @@ class RideControllerTest {
     @MockitoBean
     private DriverServiceClient driverServiceClient;
     private String passengerToken;
-    private String driverToken;
     private String adminToken;
     private Ride sampleRide;
     private AccountUserDto sampleAccount;
@@ -107,7 +105,6 @@ class RideControllerTest {
     @BeforeEach
     void setUp() {
         this.passengerToken = "Bearer " + this.jwtService.generateToken("passenger123", "passenger@ridelink.com", "PASSENGER");
-        this.driverToken = "Bearer " + this.jwtService.generateToken("driver123", "driver@ridelink.com", "DRIVER");
         this.adminToken = "Bearer " + this.jwtService.generateToken("admin123", "admin@ridelink.com", "ADMIN");
         this.sampleRide = new Ride("passenger123", new Location("SLIIT Malabe", Double.valueOf(6.9147), Double.valueOf(79.9729)), new Location("Fort", Double.valueOf(6.9344), Double.valueOf(79.8428)));
         this.sampleRide.setId("ride123");
@@ -200,7 +197,7 @@ class RideControllerTest {
     @Test
     @DisplayName(value="GET /api/v1/rides/passenger/{passengerId} returns 200 OK with history")
     void testGetPassengerRideHistory_Success() throws Exception {
-        Mockito.when((Object)this.rideRepository.findByPassengerId((String)ArgumentMatchers.eq((Object)"passenger123"), (Pageable)ArgumentMatchers.any(Pageable.class))).thenReturn((Object)new PageImpl(List.of(this.sampleRide)));
+        Mockito.when((Object)this.rideRepository.findByPassengerId((String)ArgumentMatchers.eq((Object)"passenger123"), (Pageable)ArgumentMatchers.any(Pageable.class))).thenReturn((Object)new PageImpl<Ride>(List.of(this.sampleRide)));
         this.mockMvc.perform((RequestBuilder)MockMvcRequestBuilders.get((String)"/api/v1/rides/passenger/passenger123", (Object[])new Object[0]).header("Authorization", new Object[]{this.passengerToken})).andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.jsonPath((String)"$.success", (Object[])new Object[0]).value((Object)true)).andExpect(MockMvcResultMatchers.jsonPath((String)"$.data.content[0].id", (Object[])new Object[0]).value((Object)"ride123"));
     }
 }

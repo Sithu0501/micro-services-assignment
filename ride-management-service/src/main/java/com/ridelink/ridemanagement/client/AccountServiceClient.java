@@ -16,7 +16,6 @@ import com.ridelink.ridemanagement.client.dto.AccountUserDto;
 import com.ridelink.ridemanagement.dto.response.ApiResponse;
 import com.ridelink.ridemanagement.exception.ExternalServiceException;
 import com.ridelink.ridemanagement.exception.ResourceNotFoundException;
-import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;

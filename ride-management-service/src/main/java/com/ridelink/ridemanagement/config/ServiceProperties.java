@@ -1,9 +1,4 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  org.springframework.boot.context.properties.ConfigurationProperties
- */
+
 package com.ridelink.ridemanagement.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;

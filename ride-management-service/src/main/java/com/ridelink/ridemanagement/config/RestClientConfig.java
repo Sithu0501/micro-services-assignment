@@ -10,7 +10,6 @@
  */
 package com.ridelink.ridemanagement.config;
 
-import com.ridelink.ridemanagement.config.ServiceProperties;
 import java.time.Duration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
